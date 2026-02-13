@@ -1,4 +1,5 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, UploadFile, File, HTTPException, Form
+from typing import Optional
 import shutil
 import os
 from tempfile import NamedTemporaryFile
@@ -10,7 +11,10 @@ router = APIRouter()
 analysis_service = AnalysisService()
 
 @router.post("/upload")
-async def upload_cv(file: UploadFile = File(...)):
+async def upload_cv(
+    file: UploadFile = File(...),
+    job_description: Optional[str] = Form(None)
+):
     """
     CV yükler, metni çıkarır ve tam analiz yapar.
     """
@@ -33,7 +37,7 @@ async def upload_cv(file: UploadFile = File(...)):
              return {"error": "Metin çıkarılamadı", "filename": file.filename}
 
         # 2. Analiz Servisi ile İşleme
-        analysis_result = analysis_service.analyze_cv(text)
+        analysis_result = analysis_service.analyze_cv(text, job_description)
 
         return {
             "filename": file.filename,

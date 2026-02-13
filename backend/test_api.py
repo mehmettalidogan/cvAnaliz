@@ -32,7 +32,8 @@ def test_upload():
     try:
         with open(filename, 'rb') as f:
             files = {'file': (filename, f, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')}
-            response = requests.post(url, files=files)
+            data = {'job_description': "Aranan Nitelikler: Python ve React konusunda deneyimli, Docker ve AWS bilen yazılım geliştirici aranıyor."}
+            response = requests.post(url, files=files, data=data)
             
         if response.status_code == 200:
             print("\n✅ Başarılı! Sunucu yanıtı:")

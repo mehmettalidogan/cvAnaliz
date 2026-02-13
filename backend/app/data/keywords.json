@@ -1,0 +1,18 @@
+{
+    "technical_skills": [
+        "python", "java", "c#", ".net", "javascript", "typescript", "go", "ruby", "php", "swift", "kotlin", "scala", "rust"
+    ],
+    "frameworks": [
+        "react", "vue", "angular", "django", "flask", "fastapi", "spring", "asp.net", "express", "next.js", "nestjs"
+    ],
+    "tools_and_platforms": [
+        "docker", "kubernetes", "aws", "azure", "gcp", "git", "github", "gitlab", "jenkins", "jira", "linux", "unix", "bash"
+    ],
+    "databases": [
+        "sql", "mysql", "postgresql", "mongodb", "redis", "elasticsearch", "oracle", "sqlite"
+    ],
+    "soft_skills": [
+        "communication", "teamwork", "leadership", "problem solving", "critical thinking", "time management", "adaptability",
+        "iletişim", "takım çalışması", "liderlik", "problem çözme", "eleştirel düşünme", "zaman yönetimi", "uyum sağlama"
+    ]
+}

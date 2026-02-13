@@ -9,6 +9,7 @@ function App() {
     const [result, setResult] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [jobDescription, setJobDescription] = useState("");
 
     const handleFileUpload = async (file) => {
         setLoading(true);
@@ -17,6 +18,9 @@ function App() {
 
         const formData = new FormData();
         formData.append('file', file);
+        if (jobDescription.trim()) {
+            formData.append('job_description', jobDescription);
+        }
 
         try {
             const response = await axios.post('http://127.0.0.1:8000/api/v1/cv/upload', formData, {
@@ -36,7 +40,7 @@ function App() {
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col">
             {/* Header */}
-            <header className="bg-white shadow-sm sticky top-0 z-10">
+            <header className="bg-white shadow-sm sticky top-0 z-10 print:hidden">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <div className="bg-primary p-2 rounded-lg">
@@ -44,7 +48,7 @@ function App() {
                         </div>
                         <h1 className="text-xl font-bold text-gray-900">CV Analiz Pro</h1>
                     </div>
-                    <div className="text-sm text-gray-500">v1.0.0</div>
+                    <div className="text-sm text-gray-500">v1.1.0</div>
                 </div>
             </header>
 
@@ -58,7 +62,20 @@ function App() {
                     </div>
 
                     {!result && (
-                        <FileUpload onFileUpload={handleFileUpload} isUploading={loading} />
+                        <div className="space-y-6">
+                            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    İş İlanı (Opsiyonel)
+                                </label>
+                                <textarea
+                                    className="w-full h-32 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
+                                    placeholder="Başvurduğunuz iş ilanının metnini buraya yapıştırın. Bu sayede CV'nizin ilana uygunluğunu analiz edebiliriz."
+                                    value={jobDescription}
+                                    onChange={(e) => setJobDescription(e.target.value)}
+                                />
+                            </div>
+                            <FileUpload onFileUpload={handleFileUpload} isUploading={loading} />
+                        </div>
                     )}
 
                     {error && (
@@ -82,7 +99,7 @@ function App() {
 
                             <AnalysisResult result={result} />
 
-                            <div className="flex justify-center mt-10">
+                            <div className="flex justify-center mt-10 print:hidden">
                                 <button
                                     onClick={() => setResult(null)}
                                     className="px-6 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium shadow-lg"
@@ -96,7 +113,7 @@ function App() {
             </main>
 
             {/* Footer */}
-            <footer className="bg-white border-t py-6 mt-auto">
+            <footer className="bg-white border-t py-6 mt-auto print:hidden">
                 <div className="max-w-7xl mx-auto px-4 text-center text-gray-500 text-sm">
                     &copy; {new Date().getFullYear()} CV Analiz Pro. Tüm hakları saklıdır.
                 </div>
