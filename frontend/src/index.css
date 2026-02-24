@@ -3,12 +3,112 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    /* Dark Theme - Default */
+    --bg-color: #030711;
+    --text-color: #f1f5f9;
+    --card-bg: rgba(15, 23, 42, 0.4);
+    --card-border: rgba(30, 41, 59, 1);
+    --sidebar-bg: rgba(2, 6, 23, 0.6);
+    --header-bg: rgba(2, 6, 23, 0.2);
+    --muted-text: #94a3b8;
+    --border-color: rgba(30, 41, 59, 0.6);
+    --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    --accent: #3b82f6;
+  }
+
+  :root.light {
+    /* Aura Premium Theme */
+    --bg-color: #f8faff;
+    --text-color: #1e293b;
+    --card-bg: rgba(255, 255, 255, 0.6);
+    --card-border: rgba(255, 255, 255, 0.8);
+    --sidebar-bg: rgba(255, 255, 255, 0.4);
+    --header-bg: rgba(255, 255, 255, 0.2);
+    --muted-text: #64748b;
+    --border-color: rgba(255, 255, 255, 0.5);
+    --shadow: 0 20px 40px -15px rgba(100, 116, 139, 0.15);
+    --accent: #4f46e5;
+
+    /* Aura Background Mesh */
+    background-image:
+      radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.1) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(59, 130, 246, 0.1) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.1) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, rgba(96, 165, 250, 0.1) 0px, transparent 50%);
+    background-attachment: fixed;
+  }
+
   body {
-    @apply bg-gray-50 text-gray-900 font-sans antialiased;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    @apply font-sans antialiased selection:bg-blue-500/30 transition-all duration-500;
   }
 }
 
-/* Glassmorphism Utilities */
-.glass {
-  @apply bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg border border-white border-opacity-30 shadow-lg;
+@layer components {
+  .glass-card {
+    background-color: var(--card-bg);
+    backdrop-filter: blur(25px) saturate(180%);
+    -webkit-backdrop-filter: blur(25px) saturate(180%);
+    border: 1px solid var(--card-border);
+    box-shadow: var(--shadow);
+    @apply rounded-2xl;
+  }
+
+  .glass-sidebar {
+    background-color: var(--sidebar-bg);
+    backdrop-filter: blur(40px) saturate(200%);
+    -webkit-backdrop-filter: blur(40px) saturate(200%);
+    border-right: 1px solid var(--card-border);
+  }
+
+  .bento-item {
+    @apply glass-card p-6 h-full transition-all duration-300;
+    border-color: var(--border-color);
+  }
+
+  .bento-item:hover {
+    border-color: var(--card-border);
+  }
+
+  .gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-indigo-600;
+  }
+
+  .btn-primary {
+    @apply px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-500 transition-all shadow-lg shadow-blue-900/20 active:scale-95 font-medium;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-800 rounded-full hover:bg-slate-700;
+}
+
+/* Animations */
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
 }

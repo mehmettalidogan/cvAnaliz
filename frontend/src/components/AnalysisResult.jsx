@@ -1,237 +1,162 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle, XCircle, AlertTriangle, FileText, Briefcase, Hash, Award, Download } from 'lucide-react';
+import { CheckCircle, XCircle, AlertTriangle, FileText, Briefcase, Hash, Award, Download, Mail, Phone, Link as LinkIcon, BarChart3 } from 'lucide-react';
+import SkillsRadar from './SkillsRadar';
+import { BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, Cell } from 'recharts';
 
 const AnalysisResult = ({ result }) => {
     const { ats_score, keywords, analysis, extracted_data, job_match } = result;
-    const [activeTab, setActiveTab] = useState('summary'); // summary, job_match, keywords, content
 
     const handlePrint = () => {
         window.print();
     };
 
-    const TabButton = ({ id, label, icon: Icon }) => (
-        <button
-            onClick={() => setActiveTab(id)}
-            className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-all ${activeTab === id
-                ? 'bg-blue-600 text-white shadow-md'
-                : 'bg-white text-gray-600 hover:bg-gray-50'
-                }`}
-        >
-            <Icon size={18} />
-            {label}
-        </button>
-    );
+    // Data for impact bar chart
+    const impactData = [
+        { name: 'Etki', value: analysis.impact_score || 0, color: '#3b82f6' },
+        { name: 'ATS', value: ats_score.total_score || 0, color: '#8b5cf6' },
+        { name: 'Uyum', value: job_match?.match_score || 0, color: '#ec4899' }
+    ];
 
     return (
-        <div className="w-full max-w-5xl mx-auto pb-10">
-            {/* Üst Bar: Yazdır Butonu */}
-            <div className="flex justify-end mb-8 print:hidden">
+        <div className="w-full space-y-8 pb-20">
+            {/* Header / Actions */}
+            <div className="flex items-center justify-between print:hidden">
+                <h2 className="text-2xl font-bold">Detaylı Rapor</h2>
                 <button
                     onClick={handlePrint}
-                    className="flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition-colors shadow-lg"
+                    className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg transition-all border border-slate-700"
                 >
-                    <Download size={20} />
-                    PDF Olarak Kaydet
+                    <Download size={18} />
+                    <span className="text-sm font-medium">PDF Dışa Aktar</span>
                 </button>
             </div>
 
-            {/* Navigasyon (Tablar) - Baskıda Gizle */}
-            <div className="flex flex-wrap gap-2 mb-8 print:hidden">
-                <TabButton id="summary" label="Özet" icon={FileText} />
-                {job_match && <TabButton id="job_match" label="İş Uyumu" icon={Briefcase} />}
-                <TabButton id="keywords" label="Yetkinlikler" icon={Hash} />
-                <TabButton id="content" label="İçerik Analizi" icon={Award} />
-            </div>
+            {/* Bento Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 
-            {/* İçerik Alanı */}
-            <motion.div
-                key={activeTab}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-                className="space-y-6"
-            >
-                {/* ÖZET SEKMESİ */}
-                {(activeTab === 'summary' || activeTab === 'all') && ( // 'all' modu baskı için kullanılabilir (future proof)
-                    <div className="space-y-6">
-                        {/* İletişim Bilgileri */}
-                        <div className="bg-white rounded-xl shadow p-6 border border-gray-100">
-                            <h3 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">İletişim Bilgileri</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div className="flex flex-col">
-                                    <span className="text-xs text-gray-400 uppercase">Email</span>
-                                    <span className="text-sm font-medium">{extracted_data.email || <span className="text-red-500">Bulunamadı</span>}</span>
-                                </div>
-                                <div className="flex flex-col">
-                                    <span className="text-xs text-gray-400 uppercase">Telefon</span>
-                                    <span className="text-sm font-medium">{extracted_data.phone || <span className="text-red-500">Bulunamadı</span>}</span>
-                                </div>
-                                <div className="flex flex-col">
-                                    <span className="text-xs text-gray-400 uppercase">Linkler</span>
-                                    <span className="text-sm font-medium">{extracted_data.links?.length || 0} adet bulundu</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Genel Tavsiyeler */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="bg-green-50 border border-green-200 rounded-xl p-6">
-                                <div className="flex items-center gap-2 mb-4">
-                                    <CheckCircle className="text-green-600" />
-                                    <h3 className="text-lg font-semibold text-green-800">Güçlü Yönler</h3>
-                                </div>
-                                <ul className="space-y-2">
-                                    {analysis.strengths.map((item, idx) => (
-                                        <li key={idx} className="flex items-start gap-2 text-sm text-green-700">
-                                            <span className="mt-1.5 min-w-[6px] w-[6px] h-[6px] rounded-full bg-green-500"></span>
-                                            {item}
-                                        </li>
-                                    ))}
-                                    {analysis.strengths.length === 0 && <p className="text-sm text-gray-500 italic">Belirgin güçlü yön bulunamadı.</p>}
-                                </ul>
-                            </div>
-
-                            <div className="bg-red-50 border border-red-200 rounded-xl p-6">
-                                <div className="flex items-center gap-2 mb-4">
-                                    <AlertTriangle className="text-red-600" />
-                                    <h3 className="text-lg font-semibold text-red-800">Gelişim Alanları</h3>
-                                </div>
-                                <ul className="space-y-2">
-                                    {analysis.weaknesses.map((item, idx) => (
-                                        <li key={idx} className="flex items-start gap-2 text-sm text-red-700">
-                                            <span className="mt-1.5 min-w-[6px] w-[6px] h-[6px] rounded-full bg-red-500"></span>
-                                            {item}
-                                        </li>
-                                    ))}
-                                    {analysis.weaknesses.length === 0 && <p className="text-sm text-gray-500 italic">Harika! Belirgin eksiklik yok.</p>}
-                                </ul>
-                            </div>
-                        </div>
+                {/* 1. Skill Radar (Large) */}
+                <div className="lg:col-span-2 bento-item flex flex-col">
+                    <div className="flex items-center justify-between mb-4">
+                        <h3 className="font-bold text-slate-200 flex items-center gap-2">
+                            <Hash size={18} className="text-blue-500" />
+                            Yetkinlik Haritası
+                        </h3>
                     </div>
-                )}
-
-                {/* İŞ UYUMU SEKMESİ */}
-                {activeTab === 'job_match' && job_match && (
-                    <div className="bg-white rounded-xl shadow p-6 border border-gray-100">
-                        <div className="flex items-center justify-between mb-6">
-                            <h3 className="text-lg font-semibold text-gray-800">İş İlanı Uyumu</h3>
-                            <div className="flex items-center gap-2">
-                                <span className="text-3xl font-bold text-blue-600">%{job_match.match_score}</span>
-                                <span className="text-sm text-gray-500">Eşleşme</span>
-                            </div>
-                        </div>
-
-                        <div className="space-y-6">
-                            <div>
-                                <h4 className="text-sm font-medium text-gray-700 mb-3">Eşleşen Anahtar Kelimeler</h4>
-                                <div className="flex flex-wrap gap-2">
-                                    {job_match.matching_keywords.map((kw, idx) => (
-                                        <span key={idx} className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">
-                                            {kw}
-                                        </span>
-                                    ))}
-                                    {job_match.matching_keywords.length === 0 && <p className="text-sm text-gray-500">Eşleşen kelime yok.</p>}
-                                </div>
-                            </div>
-
-                            <div>
-                                <h4 className="text-sm font-medium text-gray-700 mb-3">İlanda Olup CV'de Eksik Olanlar</h4>
-                                <div className="flex flex-wrap gap-2">
-                                    {job_match.missing_keywords.map((kw, idx) => (
-                                        <span key={idx} className="px-3 py-1 bg-red-50 text-red-600 border border-red-100 rounded-full text-sm">
-                                            {kw}
-                                        </span>
-                                    ))}
-                                    {job_match.missing_keywords.length === 0 && <p className="text-sm text-gray-500">Eksik kelime yok.</p>}
-                                </div>
-                            </div>
-                        </div>
+                    <div className="flex-grow">
+                        <SkillsRadar skillsByCategory={keywords.by_category} />
                     </div>
-                )}
+                </div>
 
-                {/* YETKİNLİKLER SEKMESİ */}
-                {activeTab === 'keywords' && (
-                    <div className="bg-white rounded-xl shadow p-6 border border-gray-100">
-                        <h3 className="text-lg font-semibold text-gray-800 mb-6">Detaylı Yetkinlik Analizi</h3>
-
-                        {/* Kategori Bazlı Gösterim */}
-                        {keywords.by_category ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {Object.entries(keywords.by_category).map(([category, skills]) => (
-                                    <div key={category} className="border border-gray-100 rounded-lg p-4">
-                                        <h4 className="text-md font-medium text-gray-700 mb-3 capitalize">{category.replace('_', ' ')}</h4>
-                                        <div className="flex flex-wrap gap-2">
-                                            {skills.map((skill, idx) => (
-                                                <span key={idx} className="px-2.5 py-1 bg-gray-100 text-gray-700 rounded text-sm">
-                                                    {skill}
-                                                </span>
-                                            ))}
-                                        </div>
-                                    </div>
+                {/* 2. Job Match Status (Medium) */}
+                <div className="lg:col-span-2 bento-item bg-gradient-to-br from-blue-900/20 to-indigo-900/20">
+                    <div className="flex items-center justify-between mb-6">
+                        <h3 className="font-bold text-slate-200 flex items-center gap-2">
+                            <Briefcase size={18} className="text-blue-400" />
+                            İş Uyumu
+                        </h3>
+                        <span className="text-2xl font-black text-blue-400">%{job_match?.match_score || 0}</span>
+                    </div>
+                    <div className="space-y-4">
+                        <div>
+                            <p className="text-[10px] uppercase font-bold text-slate-500 mb-2">Eşleşenler</p>
+                            <div className="flex flex-wrap gap-1.5">
+                                {job_match?.matching_keywords.slice(0, 5).map((kw, i) => (
+                                    <span key={i} className="px-2 py-0.5 bg-blue-500/10 text-blue-400 rounded text-[11px] border border-blue-500/20">{kw}</span>
                                 ))}
+                                {job_match?.matching_keywords.length > 5 && <span className="text-[11px] text-slate-500">+{job_match.matching_keywords.length - 5} daha</span>}
                             </div>
-                        ) : (
-                            // Legacy view if structure is different
-                            <div className="flex flex-wrap gap-2">
-                                {keywords.found_keywords.map((kw, idx) => (
-                                    <span key={idx} className="px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full text-sm">
-                                        {kw}
-                                    </span>
+                        </div>
+                        <div>
+                            <p className="text-[10px] uppercase font-bold text-slate-500 mb-2">Eksikler</p>
+                            <div className="flex flex-wrap gap-1.5">
+                                {job_match?.missing_keywords.slice(0, 5).map((kw, i) => (
+                                    <span key={i} className="px-2 py-0.5 bg-red-500/10 text-red-400 rounded text-[11px] border border-red-500/20">{kw}</span>
                                 ))}
+                                {job_match?.missing_keywords.length > 5 && <span className="text-[11px] text-slate-500">+{job_match.missing_keywords.length - 5} daha</span>}
                             </div>
-                        )}
-
-                        <div className="mt-6 pt-6 border-t">
-                            <p className="text-sm text-gray-500">
-                                Toplam <strong className="text-gray-900">{keywords.count}</strong> teknik yetkinlik tespit edildi.
-                            </p>
                         </div>
                     </div>
-                )}
+                </div>
 
-                {/* İÇERİK ANALİZİ SEKMESİ */}
-                {activeTab === 'content' && (
-                    <div className="bg-white rounded-xl shadow p-6 border border-gray-100">
-                        <h3 className="text-lg font-semibold text-gray-800 mb-6">İçerik Kalitesi ve Etki</h3>
+                {/* 3. Strengths (Medium) */}
+                <div className="lg:col-span-2 bento-item">
+                    <h3 className="font-bold text-slate-200 mb-4 flex items-center gap-2">
+                        <CheckCircle size={18} className="text-emerald-500" />
+                        Güçlü Yönler
+                    </h3>
+                    <ul className="space-y-3">
+                        {analysis.strengths.slice(0, 4).map((item, idx) => (
+                            <li key={idx} className="flex items-start gap-3 text-sm text-slate-300">
+                                <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0 shadow-[0_0_8px_rgba(16,185,129,0.6)]"></span>
+                                {item}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                            <div className="text-center p-6 bg-blue-50 rounded-xl">
-                                <div className="text-4xl font-bold text-blue-600 mb-2">{analysis.impact_score || 0}</div>
-                                <div className="text-sm font-medium text-blue-800">Etki Puanı (Metrik Kullanımı)</div>
-                                <p className="text-xs text-blue-600/80 mt-2">CV'nizde başarınızı sayılarla ifade ettiğiniz yerlerin sayısı.</p>
-                            </div>
+                {/* 4. Weaknesses (Medium) */}
+                <div className="lg:col-span-2 bento-item">
+                    <h3 className="font-bold text-slate-200 mb-4 flex items-center gap-2">
+                        <AlertTriangle size={18} className="text-amber-500" />
+                        Gelişim Alanları
+                    </h3>
+                    <ul className="space-y-3">
+                        {analysis.weaknesses.slice(0, 4).map((item, idx) => (
+                            <li key={idx} className="flex items-start gap-3 text-sm text-slate-300">
+                                <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-amber-500 shrink-0 shadow-[0_0_8px_rgba(245,158,11,0.6)]"></span>
+                                {item}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
 
-                            <div className="p-4">
-                                <h4 className="font-medium text-gray-900 mb-2">Neden Önemli?</h4>
-                                <p className="text-sm text-gray-600">
-                                    İşe alım uzmanları, "yaptım" demek yerine "ne kadar geliştirdim" diyen adayları tercih eder.
-                                    (Örn: "Satışları artırdım" yerine "%20 artış sağladım")
-                                </p>
-                            </div>
+                {/* 5. Metrics Chart (Medium) */}
+                <div className="lg:col-span-2 bento-item flex flex-col h-64">
+                    <h3 className="font-bold text-slate-200 mb-2 flex items-center gap-2">
+                        <BarChart3 size={18} className="text-indigo-400" />
+                        Performans Metrikleri
+                    </h3>
+                    <div className="flex-grow">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={impactData} layout="vertical" margin={{ left: -20, right: 20 }}>
+                                <XAxis type="number" hide />
+                                <YAxis dataKey="name" type="category" tick={{ fill: '#94a3b8', fontSize: 11 }} />
+                                <RechartsTooltip
+                                    cursor={{ fill: 'transparent' }}
+                                    contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px' }}
+                                />
+                                <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={20}>
+                                    {impactData.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={entry.color} />
+                                    ))}
+                                </Bar>
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+
+                {/* 6. Contact & Links (Medium) */}
+                <div className="lg:col-span-2 bento-item flex flex-col justify-between">
+                    <h3 className="font-bold text-slate-200 mb-4 flex items-center gap-2">
+                        <Mail size={18} className="text-slate-400" />
+                        İletişim & Erişim
+                    </h3>
+                    <div className="space-y-4 flex-grow">
+                        <div className="flex items-center gap-3 p-3 bg-slate-800/30 rounded-xl border border-slate-800/50">
+                            <Mail size={16} className="text-slate-500" />
+                            <span className="text-sm font-medium truncate">{extracted_data.email || 'Belirtilmedi'}</span>
                         </div>
-
-                        <div className="space-y-4">
-                            <h4 className="font-medium text-gray-900">İçerik İpuçları</h4>
-                            <ul className="space-y-3">
-                                <li className="flex gap-3 text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
-                                    <span className="text-blue-500 font-bold">•</span>
-                                    Aktif fiiller kullanmaya özen gösterin (Yönettim, Geliştirdim, Tasarladım).
-                                </li>
-                                <li className="flex gap-3 text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
-                                    <span className="text-blue-500 font-bold">•</span>
-                                    Yazım ve imla kurallarına dikkat edin.
-                                </li>
-                            </ul>
+                        <div className="flex items-center gap-3 p-3 bg-slate-800/30 rounded-xl border border-slate-800/50">
+                            <Phone size={16} className="text-slate-500" />
+                            <span className="text-sm font-medium">{extracted_data.phone || 'Belirtilmedi'}</span>
+                        </div>
+                        <div className="flex items-center gap-3 p-3 bg-slate-800/30 rounded-xl border border-slate-800/50">
+                            <LinkIcon size={16} className="text-slate-500" />
+                            <span className="text-sm font-medium">{extracted_data.links?.length || 0} Sosyal Bağlantı</span>
                         </div>
                     </div>
-                )}
-
-            </motion.div>
-
-            {/* Print Footer - Sadece baskıda görünür */}
-            <div className="hidden print:block text-center mt-10 text-xs text-gray-400">
-                Bu rapor CV Analiz Pro tarafından oluşturulmuştur.
+                </div>
             </div>
         </div>
     );

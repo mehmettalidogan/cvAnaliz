@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { UploadCloud } from 'lucide-react';
+import { UploadCloud, FileType, CheckCircle2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const FileUpload = ({ onFileUpload, isUploading }) => {
@@ -10,7 +10,7 @@ const FileUpload = ({ onFileUpload, isUploading }) => {
         }
     }, [onFileUpload]);
 
-    const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    const { getRootProps, getInputProps, isDragActive, acceptedFiles } = useDropzone({
         onDrop,
         accept: {
             'application/pdf': ['.pdf'],
@@ -21,6 +21,8 @@ const FileUpload = ({ onFileUpload, isUploading }) => {
         disabled: isUploading
     });
 
+    const hasFile = acceptedFiles.length > 0;
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -28,27 +30,56 @@ const FileUpload = ({ onFileUpload, isUploading }) => {
             transition={{ duration: 0.5 }}
             {...getRootProps()}
             className={`
-        p-10 border-2 border-dashed rounded-xl cursor-pointer transition-all duration-300
-        flex flex-col items-center justify-center text-center h-64
-        ${isDragActive ? 'border-primary bg-primary/5' : 'border-gray-300 hover:border-primary hover:bg-gray-50'}
-        ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}
-      `}
+                glass-card p-12 border-2 border-dashed cursor-pointer transition-all duration-500
+                flex flex-col items-center justify-center text-center min-h-[300px] group
+                ${isDragActive ? 'border-blue-500 bg-blue-500/10 scale-[1.02]' : 'border-slate-800 hover:border-slate-700 hover:bg-slate-900/40'}
+                ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}
+            `}
         >
             <input {...getInputProps()} />
-            <div className="bg-primary/10 p-4 rounded-full mb-4">
-                <UploadCloud className="w-8 h-8 text-primary" />
+
+            <div className={`
+                p-6 rounded-2xl mb-6 transition-all duration-500
+                ${isDragActive ? 'bg-blue-600 shadow-lg shadow-blue-900/40' : 'bg-slate-950/50 border border-slate-800 group-hover:border-slate-700'}
+            `}>
+                {isUploading ? (
+                    <div className="w-10 h-10 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin" />
+                ) : (
+                    <UploadCloud className={`w-10 h-10 ${isDragActive ? 'text-white' : 'text-blue-500'}`} />
+                )}
             </div>
-            {isUploading ? (
-                <p className="text-lg font-medium text-gray-700 animate-pulse">Dosya analiz ediliyor...</p>
-            ) : isDragActive ? (
-                <p className="text-lg font-medium text-primary">Dosyayı buraya bırakın...</p>
-            ) : (
-                <div>
-                    <p className="text-lg font-medium text-gray-700">CV'nizi sürükleyip bırakın</p>
-                    <p className="text-sm text-gray-500 mt-2">veya dosya seçmek için tıklayın</p>
-                    <p className="text-xs text-gray-400 mt-4">Desteklenen formatlar: PDF, DOCX</p>
-                </div>
-            )}
+
+            <div className="space-y-2">
+                {isUploading ? (
+                    <div>
+                        <p className="text-xl font-bold text-white mb-2">CV Analiz Ediliyor</p>
+                        <p className="text-slate-400 text-sm">Lütfen bekleyin, yapay zeka kurallarımız çalışıyor...</p>
+                    </div>
+                ) : isDragActive ? (
+                    <p className="text-xl font-bold text-blue-400">Dosyayı Buraya Bırak!</p>
+                ) : hasFile ? (
+                    <div className="flex flex-col items-center gap-2">
+                        <CheckCircle2 className="text-emerald-500" />
+                        <p className="text-lg font-bold text-white">{acceptedFiles[0].name}</p>
+                        <p className="text-slate-500 text-sm">Dosya değiştirilmek için tıklayın</p>
+                    </div>
+                ) : (
+                    <>
+                        <p className="text-2xl font-bold text-white">CV'nizi Buraya Bırakın</p>
+                        <p className="text-slate-400">veya dosya seçmek için <span className="text-blue-500 font-semibold underline underline-offset-4">tıklayın</span></p>
+                        <div className="flex items-center justify-center gap-4 mt-8 pt-6 border-t border-slate-800/50">
+                            <div className="flex items-center gap-1.5 text-xs text-slate-500 font-bold uppercase tracking-wider">
+                                <FileType size={14} className="text-slate-600" />
+                                PDF
+                            </div>
+                            <div className="flex items-center gap-1.5 text-xs text-slate-500 font-bold uppercase tracking-wider">
+                                <FileType size={14} className="text-slate-600" />
+                                DOCX
+                            </div>
+                        </div>
+                    </>
+                )}
+            </div>
         </motion.div>
     );
 };

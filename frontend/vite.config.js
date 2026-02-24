@@ -9,34 +9,13 @@ import path from 'path'
 
 export default defineConfig({
     plugins: [react()],
+    server: {
+        port: 5173,
+        strictPort: true,
+    },
     resolve: {
         alias: {
             "@": path.resolve(__dirname, "./src"),
-        },
-    },
-    css: {
-        postcss: {
-            plugins: [
-                tailwindcss({
-                    content: [
-                        "./index.html",
-                        "./src/**/*.{js,ts,jsx,tsx}",
-                    ],
-                    theme: {
-                        extend: {
-                            colors: {
-                                primary: "#4F46E5",
-                                secondary: "#10B981",
-                                dark: "#1F2937",
-                            },
-                            fontFamily: {
-                                sans: ['Inter', 'sans-serif'],
-                            }
-                        },
-                    },
-                }),
-                autoprefixer(),
-            ],
         },
     },
     build: {

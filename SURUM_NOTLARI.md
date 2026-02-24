@@ -12,6 +12,8 @@ Bu belgede CV Analiz Pro uygulamasının gelişim süreci ve eklenen özellikler
 - **Anahtar Kelime Tespiti**: CV içindeki teknik terimlerin taranması.
 ---
 
+
+
 ## [1.1.0] - 2026-02-13
 
 ### Yenilikler
@@ -27,3 +29,16 @@ Bu belgede CV Analiz Pro uygulamasının gelişim süreci ve eklenen özellikler
 - **Kullanıcı Arayüzü**: Sonuçlar arasında daha rahat gezinebilmeniz için sekmeli (tabs) geçiş sistemi eklendi.
 
 ---
+## [1.1.1] - 2026-02-24
+
+### Yenilikler
+- **"Aura" Tasarım Sistemi**: Standart beyaz mod tamamen kaldırılarak yerine Apple Vision Pro estetiğinde, mesh-gradient arka planlı ve gelişmiş glassmorphism (cam efekti) içeren "Aura" teması eklendi.
+- **Kontrollü Ayarlar Paneli**: Ayarlar artık anlık olarak değil, "Kaydet" butonuna basıldığında toplu olarak uygulanır. "İptal" butonu ile değişikliklerden vazgeçme imkanı eklendi.
+- **Analiz Tamamlandı Sesi**: Analiz işlemi başarıyla bittiğinde kullanıcıyı bilgilendiren sesli bildirim desteği eklendi (Ayarlar'dan kapatılabilir).
+- **Tam İngilizce Desteği**: Uygulama arayüzü, menüler ve yardım içeriği artık tam teşekküllü İngilizce desteğine sahip.
+
+### İyileştirmeler ve Düzeltmeler
+- **Görsel Bütünlük**: Tüm bileşenler (Dashboard, Sidebar, Ayarlar, Yardım) yeni Aura tasarım sistemine tam uyumlu hale getirildi.
+- **JSX ve Sözdizimi Düzeltmeleri**: Dashboard ve analiz ekranlarındaki yapısal hatalar ve JSX kapanış bozuklukları giderildi.
+- **Responsive Cam Efektleri**: Aura temasının saydamlık ve blur efektleri farklı ekran çözünürlükleri için optimize edildi.
+- **Versiyon Senkronizasyonu**: Uygulama genelindeki sürüm numaraları v1.1.1 olarak güncellendi.
